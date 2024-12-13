@@ -4,7 +4,7 @@ The destination of this work is a program, which could find determinator of matr
 #Usage
 To compile, you have to download MinGW. Official site - https://www.mingw-w64.org/downloads/<br>
 Then, add bin folder to your path.<br>
-Next step in only write this code in project directory<br>
+Next step is only to write this code in project directory<br>
 ```code
 gcc detMatrix.c -o det
 ```
