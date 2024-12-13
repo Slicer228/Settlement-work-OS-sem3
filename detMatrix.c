@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 
 #define ERROR() do{puts("ERROR IN MATRIX");exit(1);}while(0)
+#define LERROR() do{puts("ERROR IN LAUNCH");exit(1);}while(0)
 
 typedef struct{
 	int rc;
@@ -10,13 +11,13 @@ typedef struct{
 	int buf[512][512];
 }matrix;
 
-void parseMatrix(matrix *m){
+void parseMatrix(matrix *m, char *filepath){
 	char buffer[1024];
 	int rc = 0, rl = 0;
 	int num;
 	char *er;
 	char *tempEr;
-	FILE *file = fopen("m.txt","r");
+	FILE *file = fopen(filepath,"r");
 	if(file == NULL){
 		puts("ERROR WHEN READING FILE");
 		exit(1);
@@ -130,15 +131,54 @@ void printBorder(int rl){
 	puts("");
 }
 
-int main()
+void print_help() {
+	
+    FILE *help_file = fopen("readme.txt", "r");
+    if (help_file == NULL) {
+        puts("Could not open readme.txt\n");
+        return;
+    }
+	puts("HELP BLOCK ->");
+    char buffer[1024];
+    while (fgets(buffer, sizeof(buffer), help_file) != NULL) {
+        printf("%s", buffer);
+    }
+	puts("\n<-");
+    fclose(help_file);
+}
+
+int main(int argc, char *argv[])
 {
-    matrix m;//определяем объект для хранения вводных
-	parseMatrix(&m);//спарсим входной файл
-	int mat[m.rc][m.rc];//создадим массив с матрицей подходящих размеров
-	getMatrixFromBuf(&m,(int *)mat);//перекинем данные в новыйы массив
-	printBorder(m.rl);//для красоты
-	printMatrix((int *)mat,m.rc);//выводим матрицу
-	printBorder(m.rl);//для красоты
-    printf("Determinant of the matrix is : %d\n",determinantOfMatrix((int *)mat, m.rc, m.rc));//получаем определитель
-    return 0;
+	char *path = NULL;
+	if(argc < 2 || argc > 3) LERROR();
+	argv++;
+	if(argc == 2){
+		if(!strcmp(*argv,"-help")){
+			print_help();
+			return 0;
+		}else{
+			path = *argv;
+		}
+	}else{
+		if(strcmp(*argv,"-help")){
+			path = *argv;
+			if(strcmp(*(argv+1),"-help")) LERROR();
+			print_help();
+		}else{
+			path = *(argv+1);
+			print_help();
+		}
+	}
+	
+	if(path){
+		matrix m;//определяем объект для хранения вводных
+		parseMatrix(&m,path);//спарсим входной файл
+		int mat[m.rc][m.rc];//создадим массив с матрицей подходящих размеров
+		getMatrixFromBuf(&m,(int *)mat);//перекинем данные в новыйы массив
+		printBorder(m.rl);//для красоты
+		printMatrix((int *)mat,m.rc);//выводим матрицу
+		printBorder(m.rl);//для красоты
+		printf("Determinant of the matrix is : %d\n",determinantOfMatrix((int *)mat, m.rc, m.rc));//получаем определитель
+		return 0;
+	}else LERROR();
 }
