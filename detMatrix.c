@@ -49,21 +49,16 @@ void parseMatrix(matrix *m, char *filepath){
 void getCofactor(double *mat, double *temp, int p, int q, int n, int N){
     int i = 0, j = 0;
  
-    // Looping for each element of the matrix
     for (int row = 0; row < n; row++)
     {
         for (int col = 0; col < n; col++) 
         {
-            // Copying into temporary matrix 
-            // only those element which are 
-            // not in given row and column
+
             if (row != p && col != q) 
             {
                 *((temp+i*N)+j) = *((mat+row*N)+col);
 				j++;
  
-                // Row is filled, so increase row 
-                // index and reset col index
                 if (j == n - 1) 
                 {
                     j = 0;
@@ -75,29 +70,23 @@ void getCofactor(double *mat, double *temp, int p, int q, int n, int N){
 }
 
 double determinantOfMatrix(double *mat, int n, int N){
-    // Initialize result
+
     double D = 0; 
- 
-    //  Base case : if matrix contains 
-    // single element
+
     if (n == 1)
         return *mat;
  
-    // To store cofactors
+
     double temp[N][N]; 
  
-    // To store sign multiplier
     int sign = 1; 
  
-    // Iterate for each element of 
-    // first row
     for (int f = 0; f < n; f++) 
     {
-        // Getting Cofactor of mat[0][f]
+
         getCofactor((double *)mat, (double *)temp, 0, f, n, N);
         D += sign * (*(mat+f)) * determinantOfMatrix((double *)temp, n - 1, N);
  
-        // Terms are to be added with alternate sign
         sign = -sign;
     }
  
