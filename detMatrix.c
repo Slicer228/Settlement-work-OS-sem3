@@ -8,13 +8,13 @@
 typedef struct{
 	int rc;
 	int rl;
-	int buf[512][512];
+	double buf[256][256];
 }matrix;
 
 void parseMatrix(matrix *m, char *filepath){
 	char buffer[1024];
 	int rc = 0, rl = 0;
-	int num;
+	double num;
 	char *er;
 	char *tempEr;
 	FILE *file = fopen(filepath,"r");
@@ -25,7 +25,7 @@ void parseMatrix(matrix *m, char *filepath){
 	while (fgets(buffer, sizeof(buffer), file) != NULL) {
 		tempEr = buffer;
 		while(1){
-			num = strtol(tempEr,&er,10);
+			num = strtod(tempEr,&er);
 			if(tempEr == er) break;
 			m->buf[rc][rl] = num;
 			rl++;
@@ -46,7 +46,7 @@ void parseMatrix(matrix *m, char *filepath){
 }
  
 
-void getCofactor(int *mat, int *temp, int p, int q, int n, int N){
+void getCofactor(double *mat, double *temp, int p, int q, int n, int N){
     int i = 0, j = 0;
  
     // Looping for each element of the matrix
@@ -74,9 +74,9 @@ void getCofactor(int *mat, int *temp, int p, int q, int n, int N){
     }
 }
 
-int determinantOfMatrix(int *mat, int n, int N){
+double determinantOfMatrix(double *mat, int n, int N){
     // Initialize result
-    int D = 0; 
+    double D = 0; 
  
     //  Base case : if matrix contains 
     // single element
@@ -84,7 +84,7 @@ int determinantOfMatrix(int *mat, int n, int N){
         return *mat;
  
     // To store cofactors
-    int temp[N][N]; 
+    double temp[N][N]; 
  
     // To store sign multiplier
     int sign = 1; 
@@ -94,8 +94,8 @@ int determinantOfMatrix(int *mat, int n, int N){
     for (int f = 0; f < n; f++) 
     {
         // Getting Cofactor of mat[0][f]
-        getCofactor((int *)mat, (int *)temp, 0, f, n, N);
-        D += sign * (*(mat+f)) * determinantOfMatrix((int *)temp, n - 1, N);
+        getCofactor((double *)mat, (double *)temp, 0, f, n, N);
+        D += sign * (*(mat+f)) * determinantOfMatrix((double *)temp, n - 1, N);
  
         // Terms are to be added with alternate sign
         sign = -sign;
@@ -104,17 +104,17 @@ int determinantOfMatrix(int *mat, int n, int N){
     return D;
 }
  
-void printMatrix(int *arr,int n){
+void printMatrix(double *arr,int n){
 	int i, j;
 	for(i = 0; i < n; i++){
 		for(j = 0; j < n; j++){
-			printf("%3d",*((arr + i*n) + j));
+			printf("%g ",*((arr + i*n) + j));
 		}
 		puts("");
 	}
 }
 
-void getMatrixFromBuf(matrix* m, int *dest){
+void getMatrixFromBuf(matrix* m, double *dest){
 	
 	int i,j;
 	for(i = 0;i < m->rc;i++){
@@ -149,6 +149,7 @@ void print_help() {
 
 int main(int argc, char *argv[])
 {
+
 	char *path = NULL;
 	if(argc < 2 || argc > 3) LERROR();
 	argv++;
@@ -170,15 +171,15 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	if(path){
+	if(path != NULL){
 		matrix m;//определяем объект для хранения вводных
 		parseMatrix(&m,path);//спарсим входной файл
-		int mat[m.rc][m.rc];//создадим массив с матрицей подходящих размеров
-		getMatrixFromBuf(&m,(int *)mat);//перекинем данные в новыйы массив
+		double mat[m.rc][m.rc];//создадим массив с матрицей подходящих размеров
+		getMatrixFromBuf(&m,(double *)mat);//перекинем данные в новыйы массив
 		printBorder(m.rl);//для красоты
-		printMatrix((int *)mat,m.rc);//выводим матрицу
+		printMatrix((double *)mat,m.rc);//выводим матрицу
 		printBorder(m.rl);//для красоты
-		printf("Determinant of the matrix is : %d\n",determinantOfMatrix((int *)mat, m.rc, m.rc));//получаем определитель
+		printf("Determinant of the matrix is : %g\n",determinantOfMatrix((double *)mat, m.rc, m.rc));//получаем определитель
 		return 0;
 	}else LERROR();
 }
